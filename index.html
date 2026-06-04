@@ -27,8 +27,24 @@
 html{height:100%;overflow:hidden}
 body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow:hidden;display:flex;flex-direction:column}
 #app{flex:1;display:flex;flex-direction:column;overflow:hidden;max-width:430px;width:100%;margin:0 auto;background:var(--bg);position:relative}
-.screen{display:none;flex-direction:column;height:100%}
+.screen{display:none;flex-direction:column;height:100%;min-height:0}
 .screen.active{display:flex;animation:su .2s cubic-bezier(.2,.8,.4,1)}
+/* 웹 환경에서 자연 스크롤 전환 */
+@media (min-height:700px) and (pointer:fine){
+  html,body{overflow:auto;height:auto}
+  #app{overflow:visible;min-height:100vh;height:auto}
+  .screen{height:auto;min-height:100vh}
+  .scroll-body{flex:none;overflow-y:visible;height:auto}
+  .home-body{flex:none!important;overflow-y:visible!important;height:auto!important}
+  .bottom-nav{position:sticky;bottom:0;z-index:20;background:var(--bg)}
+  .home-topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
+  .topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
+  .sync-bar{position:sticky;top:52px;z-index:19}
+  .cl-prog{position:sticky;top:52px;z-index:18;background:var(--bg);padding-bottom:6px}
+  .att-date-scroll{position:sticky;top:52px;z-index:18;background:var(--bg)}
+  .day-popup-overlay{position:fixed}
+  .confirm-overlay{position:fixed}
+}
 @keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* Toast */
@@ -42,10 +58,11 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 .topbar-title{font-size:16px;font-weight:800;color:var(--text);flex:1;letter-spacing:-.4px}
 .topbar-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
 .topbar-action{font-size:12px;font-weight:600;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px 0;font-family:var(--mono);transition:color .1s}
+.topbar-action.refresh{font-size:16px;padding:4px 6px;border-radius:7px;background:var(--bg1);border:1px solid var(--line)}
 .topbar-action:active{color:var(--text)}
 
 /* Scroll */
-.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(20px + var(--safe-bottom));display:flex;flex-direction:column;gap:10px}
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(80px + var(--safe-bottom));display:flex;flex-direction:column;gap:10px}
 .scroll-body::-webkit-scrollbar{display:none}
 
 /* Bottom Nav */
@@ -165,14 +182,26 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 .cal-nav-btn:active{background:var(--bg3)}
 .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 10px 4px;border-bottom:1px solid var(--line)}
 .cal-dow-cell{text-align:center;font-size:10px;font-weight:700;color:var(--text3);font-family:var(--mono);letter-spacing:.5px;padding:2px 0}
+.cal-dow-cell.dow-sun{color:#ef4444}
+.cal-dow-cell.dow-sat{color:#3b82f6}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:4px 10px 10px;gap:3px}
 .cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:600;color:var(--text3);position:relative;cursor:default;transition:all .1s}
 .cal-cell.cur-month{color:var(--text2)}
-.cal-cell.has-data{color:var(--text);cursor:pointer;background:var(--neon-bg);font-weight:800}
+.cal-cell.dow-sun{color:#ef4444!important}
+.cal-cell.dow-sat{color:#3b82f6!important}
+.cal-cell.has-data{cursor:pointer;background:var(--neon-bg);font-weight:800}
 .cal-cell.has-data:active{background:var(--neon-bg2);transform:scale(.9)}
-.cal-cell.today{color:var(--neon-dk)!important;font-weight:900}
-.cal-cell.today::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--neon-dk)}
+.cal-cell.today{font-weight:900}
+.cal-cell.today::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor}
 .cal-cell.has-data.today{background:var(--neon-bg);box-shadow:0 0 0 1.5px var(--neon-bd)}
+/* 월별 관리내역 토글 버튼 */
+.cal-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg1);border:1.5px solid var(--line2);border-radius:var(--r);padding:11px 14px;cursor:pointer;transition:all .1s;font-family:var(--font)}
+.cal-toggle-btn:active{background:var(--bg2)}
+.cal-toggle-label{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px;display:flex;align-items:center;gap:7px}
+.cal-toggle-arrow{font-size:14px;color:var(--text3);transition:transform .2s}
+.cal-toggle-arrow.open{transform:rotate(90deg)}
+.cal-wrap-collapsible{display:none}
+.cal-wrap-collapsible.open{display:block}
 
 /* 날짜 팝업 */
 .day-popup-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:500;align-items:flex-end;justify-content:center}
@@ -212,7 +241,9 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 .sf-cnt{font-size:11px;color:var(--text3);font-family:var(--mono)}
 
 /* ══ ASSIGNEE 화면 ══ */
-.assign-block{background:var(--bg);border:1.5px solid var(--line);border-radius:var(--rmd);overflow:hidden;box-shadow:var(--shadow)}
+.assign-block{background:var(--bg);border:1.5px solid var(--line);border-radius:var(--rmd);overflow:visible;box-shadow:var(--shadow)}
+.assign-block>.ab-hd{border-radius:var(--rmd) var(--rmd) 0 0}
+.assign-block>:last-child{border-radius:0 0 var(--rmd) var(--rmd);overflow:hidden}
 .ab-hd{padding:12px 14px;background:var(--bg1);border-bottom:1px solid var(--line)}
 .ab-name{font-size:15px;font-weight:800;color:var(--text)}
 .af-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer;transition:background .08s}
@@ -389,16 +420,26 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 .att-sec-title{font-size:12px;font-weight:800;color:var(--text);letter-spacing:-.2px}
 .att-sec-cnt{font-size:11px;color:var(--text3);font-family:var(--mono)}
 /* 크루 근태 행 */
-.att-crew-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.att-crew-row{display:flex;flex-direction:column;gap:0;border-bottom:1px solid var(--line)}
 .att-crew-row:last-child{border-bottom:none}
+.att-crew-main{display:flex;align-items:center;gap:10px;padding:12px 14px}
 .att-crew-name{font-size:14px;font-weight:700;color:var(--text);flex:1}
 .att-status-wrap{display:flex;gap:4px;flex-wrap:wrap}
-.att-chip{height:26px;padding:0 10px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid var(--line2);background:var(--bg1);color:var(--text3);cursor:pointer;font-family:var(--font);transition:all .1s;white-space:nowrap}
+.att-chip{height:28px;padding:0 11px;border-radius:7px;font-size:11px;font-weight:700;border:1px solid var(--line2);background:var(--bg1);color:var(--text3);cursor:pointer;font-family:var(--font);transition:all .1s;white-space:nowrap}
 .att-chip:active{opacity:.7}
 .att-chip.s-present{background:#dcfce7;border-color:#86efac;color:#166534}
 .att-chip.s-late{background:#fef9c3;border-color:#fde047;color:#713f12}
 .att-chip.s-absent{background:#fee2e2;border-color:#fca5a5;color:#7f1d1d}
 .att-chip.s-half{background:#e0f2fe;border-color:#7dd3fc;color:#0c4a6e}
+/* 사유 입력 영역 */
+.att-reason-wrap{display:none;padding:0 14px 12px;background:var(--bg1);border-top:1px solid var(--line)}
+.att-reason-wrap.open{display:flex;gap:8px;align-items:center}
+.att-reason-input{flex:1;height:32px;border-radius:7px;border:1.5px solid var(--line2);background:var(--bg);padding:0 10px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:border .1s}
+.att-reason-input:focus{border-color:var(--neon-dk)}
+.att-reason-save{height:32px;padding:0 12px;border-radius:7px;background:var(--text);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.att-reason-save:active{background:#333}
+.att-reason-note{font-size:11px;color:var(--text3);padding:0 14px 10px;font-family:var(--mono);display:none}
+.att-reason-note.show{display:block}
 /* 이슈 작성 */
 .att-issue-compose{padding:10px 14px;border-bottom:1px solid var(--line)}
 .att-issue-list{display:flex;flex-direction:column;max-height:200px;overflow-y:auto}
@@ -465,7 +506,8 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
   <div class="home-topbar">
     <div class="home-title" id="home-title">오늘의 식물 관리</div>
     <div id="mgr-badge" class="mgr-badge" style="display:none"><div class="mgr-badge-dot"></div>MANAGER</div>
-    <button class="topbar-action" style="margin-left:8px" onclick="goSplash()">로그아웃</button>
+    <button class="topbar-action refresh" style="margin-left:4px" onclick="refreshAppData()" title="새로고침">↺</button>
+    <button class="topbar-action" style="margin-left:4px" onclick="goSplash()">로그아웃</button>
   </div>
   <div class="prog-strip">
     <div class="prog-row">
@@ -488,37 +530,46 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
       </div>
       <div class="mgr-btn-info"><div class="mgr-btn-lbl">ASSIGNEE</div><div class="mgr-btn-val" id="assign-btn-val">담당자 지정</div></div>
     </div>
-    <div class="mgr-btn" onclick="goAttendance()">
-      <div class="mgr-btn-ic">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x=".7" y="1.4" width="12.6" height="11.2" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="4.2" y1=".7" x2="4.2" y2="2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="9.8" y1=".7" x2="9.8" y2="2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1=".7" y1="4.9" x2="13.3" y2="4.9" stroke="currentColor" stroke-width="1.2"/><line x1="3.5" y1="7.7" x2="6.3" y2="7.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="3.5" y1="10" x2="8.4" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-      </div>
-      <div class="mgr-btn-info"><div class="mgr-btn-lbl">ATTENDANCE</div><div class="mgr-btn-val">근태 관리</div></div>
-    </div>
   </div>
-  <div class="home-body" style="flex:1;overflow-y:auto;padding:12px 16px calc(20px + var(--safe-bottom));display:flex;flex-direction:column;gap:10px">
-    <div class="home-body::-webkit-scrollbar" style="display:none"></div>
+  <div class="home-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(20px + var(--safe-bottom));display:flex;flex-direction:column;gap:10px">
+    <!-- 크루 관리 버튼 (매니저 전용) -->
+    <button class="cal-toggle-btn" id="crew-mgr-btn" onclick="goAttendance()" style="display:none">
+      <span class="cal-toggle-label">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x=".7" y="1.4" width="12.6" height="11.2" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="4.2" y1=".7" x2="4.2" y2="2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="9.8" y1=".7" x2="9.8" y2="2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1=".7" y1="4.9" x2="13.3" y2="4.9" stroke="currentColor" stroke-width="1.2"/><line x1="3.5" y1="7.7" x2="6.3" y2="7.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="3.5" y1="10" x2="8.4" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        크루 관리
+      </span>
+      <span style="font-size:14px;color:var(--text3)">›</span>
+    </button>
     <div class="sec-label">구역</div>
     <div id="no-sched-banner" class="no-sched-banner" style="display:none">
       <div class="nsb-t">오늘 스케줄 없음</div>
       <div class="nsb-s">매니저가 스케줄을 등록하면 관리 구역이 표시됩니다</div>
     </div>
     <div id="zone-list"></div>
-    <!-- 월별 관리내역 -->
-    <div class="sec-label" style="margin-top:6px">월별 관리내역</div>
-    <div class="cal-wrap">
-      <div class="cal-header">
-        <div class="cal-month-txt" id="cal-month-txt"></div>
-        <div class="cal-nav">
-          <button class="cal-nav-btn" onclick="calMove(-1)">‹</button>
-          <button class="cal-nav-btn" onclick="calMove(1)">›</button>
+    <!-- 월별 관리내역 (토글) -->
+    <button class="cal-toggle-btn" id="cal-toggle-btn" onclick="toggleCalendar()">
+      <span class="cal-toggle-label">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x=".7" y="2.1" width="12.6" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1=".7" y1="5.3" x2="13.3" y2="5.3" stroke="currentColor" stroke-width="1.2"/><line x1="4.2" y1=".7" x2="4.2" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="9.8" y1=".7" x2="9.8" y2="3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        월별 관리내역
+      </span>
+      <span class="cal-toggle-arrow" id="cal-toggle-arrow">›</span>
+    </button>
+    <div class="cal-wrap-collapsible" id="cal-wrap-collapsible">
+      <div class="cal-wrap">
+        <div class="cal-header">
+          <div class="cal-month-txt" id="cal-month-txt"></div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calMove(-1)">‹</button>
+            <button class="cal-nav-btn" onclick="calMove(1)">›</button>
+          </div>
         </div>
+        <div class="cal-dow">
+          <div class="cal-dow-cell dow-sun">일</div><div class="cal-dow-cell">월</div><div class="cal-dow-cell">화</div>
+          <div class="cal-dow-cell">수</div><div class="cal-dow-cell">목</div><div class="cal-dow-cell">금</div>
+          <div class="cal-dow-cell dow-sat">토</div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
       </div>
-      <div class="cal-dow">
-        <div class="cal-dow-cell">일</div><div class="cal-dow-cell">월</div><div class="cal-dow-cell">화</div>
-        <div class="cal-dow-cell">수</div><div class="cal-dow-cell">목</div><div class="cal-dow-cell">금</div>
-        <div class="cal-dow-cell">토</div>
-      </div>
-      <div class="cal-grid" id="cal-grid"></div>
     </div>
     <!-- 이슈 메모 (매니저 전용) -->
     <div id="log-section" style="display:none">
@@ -571,7 +622,7 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 <div id="screen-attendance" class="screen">
   <div class="topbar">
     <button class="btn-back" onclick="show('screen-home')">←</button>
-    <div class="topbar-title">근태 관리</div>
+    <div class="topbar-title">크루 관리</div>
     <div class="topbar-sub" id="att-selected-date"></div>
   </div>
   <!-- 날짜 선택 -->
@@ -668,7 +719,6 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
   <div class="cpl-wrap">
     <div class="cpl-badge"><span class="cpl-badge-txt">DONE</span></div>
     <div class="cpl-title">수고하셨습니다!</div>
-    <div class="cpl-sub">오늘의 관리가 완료되었습니다.</div>
     <div class="stat-grid">
       <div class="stat-c full"><div class="stat-lbl">완료 구역</div><div class="stat-val" id="done-zone">-</div></div>
       <div class="stat-c"><div class="stat-lbl">완료 항목</div><div class="stat-val" id="done-count">-</div></div>
@@ -676,7 +726,6 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
     </div>
     <button id="cpl-assign-btn" class="cpl-assign-btn" style="display:none" onclick="goAssign()">담당자 지정하기</button>
     <button class="cpl-home-btn" onclick="show('screen-home');updateHomeProg()">홈으로 돌아가기</button>
-    <button class="cpl-out-btn" onclick="goSplash()">다른 크루로 전환</button>
   </div>
 </div>
 
@@ -690,44 +739,219 @@ body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);
 if(typeof google === 'undefined'){
   var _MOCK_SPOTS = {
     'A동': { floors: {
-      '13층': { sections: {
-        '라이언': { name:'라이언', items:[
-          {id:'id001',name:'라이언 이스트',notice:null,detail:'대형 플랜트박스 1,대형 플랜트박스 2,소파뒤 박스',checked:false,memo:'',memoWho:''},
-          {id:'id002',name:'라이언 웨스트',notice:null,detail:'L자 플랜트박스,대형 플랜트박스',checked:false,memo:'',memoWho:''},
-          {id:'id003',name:'라이언 오아시스',notice:'관수하지 않습니다',detail:null,checked:false,memo:'',memoWho:''},
-        ]},
+      '14층': { sections: {
         '조르디': { name:'조르디', items:[
-          {id:'id004',name:'조르디 이스트',notice:null,detail:'대형 플랜트박스,소형 화분',checked:false,memo:'',memoWho:''},
-          {id:'id005',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
-          {id:'id006',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_14_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_14_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_14_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_14_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_14_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_14_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
         ]},
       }},
-      '14층': { sections: {
+      '13층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_13_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_13_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_13_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
         '라이언': { name:'라이언', items:[
-          {id:'id007',name:'라이언 이스트',notice:null,detail:'대형 플랜트박스 1,홍콩박스',checked:false,memo:'',memoWho:''},
-          {id:'id008',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_13_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_13_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_13_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '12층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_12_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_12_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_12_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_12_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_12_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_12_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '11층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_11_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_11_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_11_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_11_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_11_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_11_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '10층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_10_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_10_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_10_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_10_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_10_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_10_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '9층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_9_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_9_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_9_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_9_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_9_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_9_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '임원실': { name:'임원실', items:[
+          {id:'id_9_exec_in',name:'임원실 내부',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_9_exec_out',name:'임원실 외부화단',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '8층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_8_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_8_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_8_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_8_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_8_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_8_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '7층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_7_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_7_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_7_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_7_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_7_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_7_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '6층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_6_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_6_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_6_jo',name:'조르디 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '라이언': { name:'라이언', items:[
+          {id:'id_6_rw',name:'라이언 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_6_re',name:'라이언 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_6_ro',name:'라이언 오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '5층': { sections: {
+        '조르디': { name:'조르디', items:[
+          {id:'id_5_jw',name:'조르디 웨스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_5_je',name:'조르디 이스트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+        '기타': { name:'기타', items:[
+          {id:'id_5_oa',name:'오아시스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_5_cafe',name:'카페 라운지',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '3층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_3_kk',name:'카카오지회/미팅룸',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '2층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_2_tok',name:'톡테라스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+    }},
+    'B동': { floors: {
+      '2층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b2_iv',name:'인터뷰스페이스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '3층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b3_of',name:'오피스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '4층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b4_et',name:'윤리경영실',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_b4_kv',name:'카카오벤처스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '5층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b5_cafe',name:'카페 라운지',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_b5_back',name:'가든 백오피스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_b5_hc',name:'헬스케어',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '6층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b6_hc',name:'헬스케어',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '7층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b7_hc',name:'헬스케어',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '9층': { sections: {
+        '기타': { name:'기타', items:[
+          {id:'id_b9_of',name:'오피스',notice:null,detail:null,checked:false,memo:'',memoWho:''},
         ]},
       }},
     }},
     '공용부': { floors: {
-      '1층': { sections: { '공용 구역': { name:'공용 구역', items:[
-        {id:'id010',name:'1층 로비',notice:null,detail:null,checked:false,memo:'',memoWho:''},
-      ]}}},
-      '5층 카페': { sections: { '공용 구역': { name:'공용 구역', items:[
-        {id:'id011',name:'5층 카페',notice:null,detail:null,checked:false,memo:'',memoWho:''},
-      ]}}},
+      '1층': { sections: {
+        '공용': { name:'공용', items:[
+          {id:'id_c1_garden',name:'정원',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '2층': { sections: {
+        '공용': { name:'공용', items:[
+          {id:'id_c2_lobby',name:'로비',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_c2_ajit',name:'아지뜰',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '3층': { sections: {
+        '공용': { name:'공용', items:[
+          {id:'id_c3_lobby',name:'로비',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '4층': { sections: {
+        '공용': { name:'공용', items:[
+          {id:'id_c4_lobby',name:'로비',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+          {id:'id_c4_book',name:'북아지트',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
+      '5층': { sections: {
+        '공용': { name:'공용', items:[
+          {id:'id_c5_bridge',name:'브릿지화단',notice:null,detail:null,checked:false,memo:'',memoWho:''},
+        ]},
+      }},
     }},
   };
   var _MOCK_CREWS = [
-    {name:'김민준',role:'팀리더',part:'DS크루',isManager:true,pin:'1234'},
-    {name:'올리버',role:'가드너',part:'DS크루',isManager:false,pin:''},
-    {name:'파인',role:'가드너',part:'DS크루',isManager:false,pin:''},
-    {name:'헨리',role:'가드너',part:'DS크루',isManager:false,pin:''},
-    {name:'루카',role:'가드너',part:'DS크루',isManager:false,pin:''},
-    {name:'엘리',role:'가드너',part:'DS크루',isManager:false,pin:''},
+    {name:'올리버',role:'가드너',isManager:false,pin:''},
+    {name:'파인',role:'가드너',isManager:false,pin:''},
+    {name:'헨리',role:'가드너',isManager:false,pin:''},
+    {name:'루카',role:'가드너',isManager:false,pin:''},
+    {name:'엘리',role:'매니저',isManager:true,pin:'1234'},
+    {name:'제이미',role:'팀리더',isManager:true,pin:'1235'},
   ];
   var _MOCK_SCHEDULE = [
-    {zone:'A동',floor:'13층'},{zone:'A동',floor:'14층'},{zone:'공용부',floor:'5층 카페'}
+    {zone:'A동',floor:'13층'},{zone:'A동',floor:'14층'},{zone:'공용부',floor:'1층'}
   ];
   var _MOCK_ASSIGNEES = [
     {zone:'A동',floor:'13층',team:'라이언 이스트',crews:['올리버','파인']},
@@ -756,7 +980,7 @@ if(typeof google === 'undefined'){
       return {
         withFailureHandler: function(){ return this; },
         getCrewList:        function(){ setTimeout(function(){ _cb({success:true,data:_MOCK_CREWS}); },60); },
-        verifyManagerPin:   function(n,p){ setTimeout(function(){ _cb({success:true,data:{ok:p==='1234'}}); },60); },
+        verifyManagerPin:   function(n,p){ var crew=_MOCK_CREWS.find(function(c){return c.name===n;}); var ok=crew&&crew.pin&&p===crew.pin; setTimeout(function(){ _cb({success:true,data:{ok:ok}}); },60); },
         loadAppData:        function(crew){
           var isManager = _MOCK_CREWS.some(function(c){ return c.name===crew&&c.isManager; });
           var spots = isManager ? _MOCK_SPOTS : _MOCK_SPOTS; // 전체
@@ -775,11 +999,25 @@ if(typeof google === 'undefined'){
         recordCheck:    function(){ setTimeout(function(){ _cb({success:true,data:{recorded:true,time:'12:00:00'}}); },60); },
         recordFloorComplete: function(){ setTimeout(function(){ _cb({success:true,data:{recorded:true,count:0,time:'12:00:00'}}); },60); },
         getMonthlyRecords: function(){
-          var today = new Date().toISOString().slice(0,10);
-          var mock = {}; mock[today]=[
+          var today = new Date();
+          var mock = {};
+          // 오늘 포함 최근 15일 누적 샘플 데이터 생성
+          var spotPool=[
             {crew:'올리버',zone:'A동',floor:'13층',spot:'라이언 이스트',time:'10:30',memo:''},
             {crew:'파인',zone:'A동',floor:'13층',spot:'라이언 웨스트',time:'11:00',memo:''},
+            {crew:'헨리',zone:'A동',floor:'14층',spot:'라이언 웨스트',time:'09:45',memo:''},
+            {crew:'루카',zone:'공용부',floor:'5층 카페',spot:'공용 구역',time:'13:20',memo:''},
+            {crew:'올리버',zone:'A동',floor:'13층',spot:'조르디 이스트',time:'10:50',memo:''},
           ];
+          for(var i=0;i<15;i++){
+            var d=new Date(today); d.setDate(today.getDate()-i);
+            // 주말(토0→6, 일0→0) 제외
+            var dow=d.getDay(); if(dow===0||dow===6) continue;
+            var ds=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+            // 날짜마다 2~3개 랜덤 레코드
+            var picks=spotPool.slice(0, (i%3)+2);
+            mock[ds]=picks.map(function(p){ return Object.assign({},p); });
+          }
           setTimeout(function(){ _cb({success:true,data:mock}); },60);
         },
         loadTodayLog: function(){ setTimeout(function(){ _cb({success:true,data:{attendance:_MOCK_ATT,issues:_MOCK_ISSUES,today:new Date().toISOString().slice(0,10)}}); },60); },
@@ -787,28 +1025,13 @@ if(typeof google === 'undefined'){
         saveIssue: function(p){ var t=new Date().toTimeString().slice(0,5); _MOCK_ISSUES.push({time:t,author:p.crewName,tag:p.tag,content:p.content}); setTimeout(function(){ _cb({success:true,data:{time:t}}); },30); },
         deleteIssue: function(p){ _MOCK_ISSUES=_MOCK_ISSUES.filter(function(i){return !(i.time===p.time&&i.content===p.content);}); setTimeout(function(){ _cb({success:true,data:{deleted:true}}); },30); },
         getAttendanceByDate: function(dateStr){
-          // 목업: 오늘 날짜면 샘플 반환
-          var mock=[
-            {name:'올리버',status:'present',note:''},
-            {name:'파인',status:'late',note:'10분 지각'},
-            {name:'헨리',status:'present',note:''},
-          ];
-          setTimeout(function(){ _cb({success:true,data:{attendance:mock}}); },100);
+          setTimeout(function(){ _cb({success:true,data:{attendance:[]}}); },100);
         },
         getIssuesByDate: function(dateStr){
-          // 목업: 날짜별 이슈 반환
-          var mock=[
-            {time:'09:30',author:'김민준',tag:'plant',content:'13층 라이언 이스트 플랜트박스 물 과습 주의'},
-            {time:'11:00',author:'김민준',tag:'general',content:'오전 작업 완료, 오후 추가 점검 예정'},
-          ];
-          setTimeout(function(){ _cb({success:true,data:{issues:mock}}); },100);
+          setTimeout(function(){ _cb({success:true,data:{issues:[]}}); },100);
         },
         getAllTodayChecked: function(){
-          // 목업: 랜덤하게 완료 기록 시뮬레이션
-          var mock = {};
-          // 'id002' 라이언 웨스트를 올리버가 완료한 것처럼
-          mock['id002'] = {crew:'올리버', time:'10:30'};
-          setTimeout(function(){ _cb({success:true, data:{checkedIds:mock, ts:'10:30:00'}}); }, 200);
+          setTimeout(function(){ _cb({success:true, data:{checkedIds:{}, ts:'00:00:00'}}); }, 200);
         },
       };
     },
@@ -834,8 +1057,8 @@ var pinBuf=[],pinCrew='';
 // 달력 상태
 var calYear=0,calMonth=0,calData={};  // calData: {"2025-06-03":[...]}
 
-var ZONE_ORDER=['A동','B동','공용부','외부화단','외부 화단'];
-var COMMON_FLOORS=['지하1층 춘식도락','1층','2층','3층','4층','5층 카페'];
+var ZONE_ORDER=['A동','B동','공용부'];
+var COMMON_FLOORS=['1층','2층','3층','4층','5층'];
 
 // ── 초기화 ──────────────────────────────────────────────
 window.addEventListener('load',function(){
@@ -851,10 +1074,19 @@ window.addEventListener('load',function(){
 function onCrewLoaded(res){
   if(!res.success){ document.getElementById('splash-err').style.display='block'; show('screen-splash'); return; }
   var sel=document.getElementById('crew-select');
-  res.data.forEach(function(c){
+  // 일반 크루 먼저, 제이미(팀리더)는 맨 마지막
+  var normal=res.data.filter(function(c){ return c.name!=='제이미'; });
+  var jamie =res.data.filter(function(c){ return c.name==='제이미'; });
+  normal.concat(jamie).forEach(function(c){
     var o=document.createElement('option');
     o.value=c.name;
-    o.textContent=c.name+(c.part?' · '+c.part:'')+(c.isManager?' [매니저]':'');
+    o.dataset.isManager=c.isManager?'1':'0'; // 매니저 여부를 data 속성에 저장
+    if(c.name==='제이미'){
+      o.textContent='제이미 [팀리더]';
+    } else {
+      var mgrLabel = c.isManager ? ' ['+( c.role||'매니저')+']' : '';
+      o.textContent=c.name+mgrLabel;
+    }
     sel.appendChild(o);
   });
   show('screen-splash');
@@ -864,7 +1096,7 @@ function onCrewLoaded(res){
 function onStartTap(){
   var sel=document.getElementById('crew-select');
   if(!sel.value){ showToast('이름을 선택해 주세요'); return; }
-  var isMgr=sel.options[sel.selectedIndex].textContent.indexOf('[매니저]')>=0;
+  var isMgr=sel.options[sel.selectedIndex].dataset.isManager==='1';
   if(isMgr){
     pinCrew=sel.value; pinBuf=[];
     document.getElementById('pin-name').textContent=sel.value+' 님';
@@ -954,22 +1186,43 @@ function onAppLoaded(res){
     document.getElementById('mgr-actions').style.display='flex';
     document.getElementById('cpl-assign-btn').style.display='block';
     document.getElementById('log-section').style.display='block';
+    document.getElementById('crew-mgr-btn').style.display='flex';
     loadTodayLog();
   }
   _refreshMgrBtns();
   updateHomeProg();
   renderZoneList();
-  loadCalendar();
+  // 달력은 버튼 클릭 시 로드 (toggleCalendar)
   show('screen-home');
   startHomeSync();
 }
 
 function _sortCF(d){
-  if(!d['공용부']) return;
-  var fl=d['공용부'].floors,s={};
-  COMMON_FLOORS.forEach(function(f){ if(fl[f]) s[f]=fl[f]; });
-  Object.keys(fl).forEach(function(f){ if(!s[f]) s[f]=fl[f]; });
-  d['공용부'].floors=s;
+  // 공용부: 지정 순서로 정렬
+  if(d['공용부']){
+    var fl=d['공용부'].floors,s={};
+    COMMON_FLOORS.forEach(function(f){ if(fl[f]) s[f]=fl[f]; });
+    Object.keys(fl).forEach(function(f){ if(!s[f]) s[f]=fl[f]; });
+    d['공용부'].floors=s;
+  }
+  // A동: 층 숫자 내림차순 정렬 (14층→2층)
+  if(d['A동']){
+    var afl=d['A동'].floors;
+    var sorted={};
+    Object.keys(afl).sort(function(a,b){
+      return (parseInt(b)||0)-(parseInt(a)||0);
+    }).forEach(function(f){ sorted[f]=afl[f]; });
+    d['A동'].floors=sorted;
+  }
+  // B동: 층 숫자 오름차순
+  if(d['B동']){
+    var bfl=d['B동'].floors;
+    var bsorted={};
+    Object.keys(bfl).sort(function(a,b){
+      return (parseInt(a)||0)-(parseInt(b)||0);
+    }).forEach(function(f){ bsorted[f]=bfl[f]; });
+    d['B동'].floors=bsorted;
+  }
 }
 
 function _refreshMgrBtns(){
@@ -977,8 +1230,13 @@ function _refreshMgrBtns(){
   var sb=document.getElementById('sched-btn');
   var av=document.getElementById('assign-btn-val');
   var ab=document.getElementById('assign-btn');
-  if(S.schedule.length>0){ sv.textContent=S.schedule.length+'개 층 스케줄됨'; sb.classList.add('active'); }
-  else{ sv.textContent='스케줄 등록'; sb.classList.remove('active'); }
+  if(S.schedule.length>0){
+    var d=new Date();
+    var DAYS=['일','월','화','수','목','금','토'];
+    var dateLabel=(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+DAYS[d.getDay()]+')';
+    sv.textContent=dateLabel+' · '+S.schedule.length+'개 층';
+    sb.classList.add('active');
+  } else { sv.textContent='스케줄 등록'; sb.classList.remove('active'); }
   if(S.assignees.length>0){ av.textContent=S.assignees.length+'건 배정됨'; ab.classList.add('active'); }
   else{ av.textContent='담당자 지정'; ab.classList.remove('active'); }
 }
@@ -1045,6 +1303,15 @@ function updateHomeProg(){
 }
 
 // ── 달력 ─────────────────────────────────────────────────
+function toggleCalendar(){
+  var wrap = document.getElementById('cal-wrap-collapsible');
+  var arrow = document.getElementById('cal-toggle-arrow');
+  var isOpen = wrap.classList.contains('open');
+  wrap.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+  if(!isOpen) loadCalendar(); // 열 때 로드
+}
+
 function loadCalendar(){
   google.script.run
     .withSuccessHandler(function(res){
@@ -1075,10 +1342,16 @@ function renderCalendar(){
   }
   for(var d=1;d<=lastDate;d++){
     var dateStr=calYear+'-'+pad(calMonth)+'-'+pad(d);
+    var dow=new Date(calYear,calMonth-1,d).getDay(); // 0=일,6=토
     var hasData=!!(calData[dateStr]&&calData[dateStr].length>0);
     var isToday=(ty===calYear&&tm===calMonth&&td===d);
     var cell=document.createElement('div');
-    cell.className='cal-cell cur-month'+(hasData?' has-data':'')+(isToday?' today':'');
+    var cls='cal-cell cur-month';
+    if(dow===0) cls+=' dow-sun';
+    else if(dow===6) cls+=' dow-sat';
+    if(hasData) cls+=' has-data';
+    if(isToday) cls+=' today';
+    cell.className=cls;
     cell.textContent=d;
     if(hasData)(function(ds,dn){ cell.onclick=function(){ openDayPopup(ds,dn); }; })(dateStr,d);
     grid.appendChild(cell);
@@ -1155,6 +1428,18 @@ function goSchedule(){
   schedSel={};
   S.schedule.forEach(function(s){ schedSel[s.zone+'|'+s.floor]=true; });
   var body=document.getElementById('sched-body'); body.innerHTML='';
+
+  // allSpots 비어있으면 안내 표시
+  if(!S.allSpots || Object.keys(S.allSpots).length===0){
+    body.innerHTML=
+      '<div style="margin:20px 0;background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:var(--rmd);padding:20px;text-align:center">'+
+        '<div style="font-size:14px;font-weight:800;color:var(--amber);margin-bottom:6px">스팟 데이터 없음</div>'+
+        '<div style="font-size:12px;color:var(--amber);opacity:.8;line-height:1.6">스프레드시트 <b>스팟목록</b> 시트에<br>데이터를 입력해 주세요</div>'+
+      '</div>';
+    show('screen-schedule');
+    return;
+  }
+
   _orderedZones(S.allSpots).forEach(function(z){
     var fl=S.allSpots[z].floors,fk=Object.keys(fl);
     var allOn=fk.every(function(f){ return schedSel[z+'|'+f]; });
@@ -1232,7 +1517,13 @@ function _filterBySched(all,items){
 
 // ── 담당자 지정 ─────────────────────────────────────────
 function goAssign(){
-  var base=S.allSpots;  // 담당자 지정은 항상 전체 스팟 기준
+  // 스케줄에 등록된 층만 필터링 (스케줄이 없으면 전체)
+  var base;
+  if(S.schedule.length>0){
+    base = _filterBySched(S.allSpots, S.schedule);
+  } else {
+    base = S.allSpots;
+  }
   assignSel={}; assignMap={};
   S.assignees.forEach(function(a){ var fk=a.zone+'|'+a.floor; assignSel[fk]=true; var mk=fk+'|'+a.team; assignMap[mk]=a.crews.slice(); });
   document.getElementById('assign-sub').textContent=S.schedule.length+'개 층';
@@ -1261,15 +1552,17 @@ function goAssign(){
 
 function _buildTeamPanelHTML(z,f){
   var key=z+'|'+f;
+  // 해당 층의 실제 섹션(존)만 사용
+  var floorData = S.allSpots[z] && S.allSpots[z].floors[f];
+  var teams = floorData ? Object.keys(floorData.sections) : S.teams;
   var html='<div class="tp-lbl">팀별 담당자 지정</div><div class="team-list">';
-  S.teams.forEach(function(team){
+  teams.forEach(function(team){
     var mk=key+'|'+team, sel=assignMap[mk]||[];
     html+='<div class="team-row"><div class="team-name">'+team+'</div><div class="crew-tags" id="tcw-'+eK(mk)+'">';
-    // 고정 특수 태그: 공동, 엘리
-    ['공동','엘리'].forEach(function(fixedName){
-      var isSel=sel.indexOf(fixedName)>=0;
-      html+='<span class="crew-tag'+(isSel?' sel':'')+'" onclick="toggleCrewAssign(\''+eA(z)+'\',\''+eA(f)+'\',\''+eA(team)+'\',\''+eA(fixedName)+'\')">'+fixedName+'</span>';
-    });
+    // 공동 태그
+    var isSel=sel.indexOf('공동')>=0;
+    html+='<span class="crew-tag'+(isSel?' sel':'')+'" onclick="toggleCrewAssign(\''+eA(z)+'\',\''+eA(f)+'\',\''+eA(team)+'\',\'공동\')">공동</span>';
+    // 크루 목록 (매니저 제외)
     S.crewList.forEach(function(c){
       if(c.isManager) return;
       var isSel=sel.indexOf(c.name)>=0;
@@ -1285,7 +1578,13 @@ function assignToggleFloor(z,f){
   var key=z+'|'+f; assignSel[key]=!assignSel[key];
   var c=document.getElementById('afc-'+eK(key)); if(c){ c.classList.toggle('on',assignSel[key]); c.textContent=assignSel[key]?'✓':''; }
   var p=document.getElementById('tp-'+eK(key)); if(p){ assignSel[key]?p.classList.add('open'):p.classList.remove('open'); }
-  if(!assignSel[key]){ S.teams.forEach(function(t){ assignMap[key+'|'+t]=[]; }); if(p) p.innerHTML=_buildTeamPanelHTML(z,f); }
+  if(!assignSel[key]){
+    // 해당 층 실제 섹션 기준으로 초기화
+    var floorData = S.allSpots[z] && S.allSpots[z].floors[f];
+    var teams = floorData ? Object.keys(floorData.sections) : S.teams;
+    teams.forEach(function(t){ assignMap[key+'|'+t]=[]; });
+    if(p) p.innerHTML=_buildTeamPanelHTML(z,f);
+  }
   _refreshAssignStats();
 }
 function toggleCrewAssign(z,f,team,crewName){
@@ -1308,7 +1607,10 @@ function commitAssign(){
   Object.keys(assignSel).forEach(function(key){
     if(!assignSel[key]) return;
     var p=key.split('|'),z=p[0],f=p.slice(1).join('|');
-    S.teams.forEach(function(team){
+    // 해당 층 실제 섹션 기준으로 저장
+    var floorData = S.allSpots[z] && S.allSpots[z].floors[f];
+    var teams = floorData ? Object.keys(floorData.sections) : S.teams;
+    teams.forEach(function(team){
       var crews=(assignMap[key+'|'+team]||[]).filter(Boolean);
       if(crews.length>0) items.push({zone:z,floor:f,team:team,crews:crews});
     });
@@ -1758,23 +2060,77 @@ var _floorSyncTimer = null;
 
 // ── 홈 화면 진행률 실시간 갱신 ───────────────────────────
 var _homeSyncTimer = null;
+var _dataRefreshTimer = null;
+var DATA_REFRESH_INTERVAL = 5 * 60 * 1000; // 5분
 
 function startHomeSync(){
   stopHomeSync();
+  // 완료기록 30초 싱크
   _homeSyncTimer = setInterval(function(){
     google.script.run
       .withSuccessHandler(function(res){
         if(!res.success) return;
         remoteChecked = res.data.checkedIds || {};
-        updateHomeProg();  // 홈 진행률 즉시 반영
+        updateHomeProg();
       })
       .withFailureHandler(function(){})
       .getAllTodayChecked();
   }, 30000);
+
+  // 스프레드시트 전체 데이터 5분 자동 새로고침
+  _dataRefreshTimer = setInterval(function(){
+    // 홈 화면일 때만 갱신
+    if(!document.getElementById('screen-home').classList.contains('active')) return;
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(!res.success) return;
+        S.schedule  = res.data.schedule  || [];
+        S.assignees = res.data.assignees || [];
+        S.allSpots  = res.data.allSpots  || {};
+        S.spotsData = res.data.spots     || {};
+        S.crewList  = res.data.crewList  || [];
+        if(res.data.teams) S.teams = res.data.teams;
+        _sortCF(S.spotsData); _sortCF(S.allSpots);
+        // 새 아이템 초기화 (기존 체크 유지)
+        eachItem(function(item){
+          if(!checked.hasOwnProperty(item.id)) checked[item.id] = false;
+        });
+        _refreshMgrBtns();
+        updateHomeProg();
+        showToast('데이터 업데이트됨');
+      })
+      .withFailureHandler(function(){})
+      .loadAppData(S.crew);
+  }, DATA_REFRESH_INTERVAL);
 }
 
 function stopHomeSync(){
   if(_homeSyncTimer){ clearInterval(_homeSyncTimer); _homeSyncTimer=null; }
+  if(_dataRefreshTimer){ clearInterval(_dataRefreshTimer); _dataRefreshTimer=null; }
+}
+
+// 수동 새로고침 (홈 화면 당겨서 새로고침 대용)
+function refreshAppData(){
+  showToast('새로고침 중...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(!res.success){ showToast('새로고침 실패'); return; }
+      S.schedule  = res.data.schedule  || [];
+      S.assignees = res.data.assignees || [];
+      S.allSpots  = res.data.allSpots  || {};
+      S.spotsData = res.data.spots     || {};
+      S.crewList  = res.data.crewList  || [];
+      if(res.data.teams) S.teams = res.data.teams;
+      _sortCF(S.spotsData); _sortCF(S.allSpots);
+      eachItem(function(item){
+        if(!checked.hasOwnProperty(item.id)) checked[item.id] = false;
+      });
+      _refreshMgrBtns();
+      updateHomeProg();
+      showToast('업데이트 완료 ✓');
+    })
+    .withFailureHandler(function(){ showToast('새로고침 실패'); })
+    .loadAppData(S.crew);
 }
 
 function startFloorSync(){
@@ -2176,16 +2532,21 @@ function _renderAttBody(date, attendance, issues){
     (attendance.length||0)+'명 기록</span>';
   attSec.appendChild(attHd);
 
+  // 매니저 제외, 엘리 포함 전체 크루
   var crewList = S.crewList.filter(function(c){ return !c.isManager; });
-  // 근태 맵
   var attMap = {};
-  attendance.forEach(function(a){ attMap[a.name]={status:a.status,note:a.note}; });
+  attendance.forEach(function(a){ attMap[a.name]={status:a.status,note:a.note||''}; });
+  var NEED_REASON = ['late','absent','half']; // 사유 필요한 상태
 
   crewList.forEach(function(c){
     var cur = attMap[c.name] || {status:'', note:''};
     var row = document.createElement('div');
     row.className = 'att-crew-row';
     row.id = 'att-row-'+eK(c.name+date);
+
+    // 상단: 이름 + 상태 버튼
+    var mainDiv = document.createElement('div');
+    mainDiv.className = 'att-crew-main';
 
     var nameDiv = document.createElement('div');
     nameDiv.className = 'att-crew-name';
@@ -2194,24 +2555,76 @@ function _renderAttBody(date, attendance, issues){
     var statusWrap = document.createElement('div');
     statusWrap.className = 'att-status-wrap';
 
+    // 사유 메모 표시 (저장된 사유)
+    var noteEl = document.createElement('div');
+    noteEl.className = 'att-reason-note' + (cur.note?' show':'');
+    noteEl.id = 'att-note-'+eK(c.name+date);
+    noteEl.textContent = cur.note ? '사유: '+cur.note : '';
+
+    // 사유 입력 영역
+    var reasonWrap = document.createElement('div');
+    var needReason = NEED_REASON.indexOf(cur.status) >= 0;
+    reasonWrap.className = 'att-reason-wrap' + (isToday && needReason ? ' open' : '');
+    reasonWrap.id = 'att-reason-'+eK(c.name+date);
+    var reasonInput = document.createElement('input');
+    reasonInput.type = 'text';
+    reasonInput.className = 'att-reason-input';
+    reasonInput.id = 'att-ri-'+eK(c.name+date);
+    reasonInput.placeholder = '사유를 입력하세요 (선택)';
+    reasonInput.value = cur.note || '';
+    reasonInput.maxLength = 50;
+    var reasonSave = document.createElement('button');
+    reasonSave.className = 'att-reason-save';
+    reasonSave.textContent = '저장';
+    (function(name, inputEl, noteDispEl){
+      reasonSave.onclick = function(){
+        var txt = inputEl.value.trim();
+        _saveAttNote(name, attMap[name]&&attMap[name].status||'', txt, date);
+        if(attMap[name]) attMap[name].note = txt;
+        noteDispEl.textContent = txt ? '사유: '+txt : '';
+        txt ? noteDispEl.classList.add('show') : noteDispEl.classList.remove('show');
+        showToast('사유 저장됨');
+      };
+    })(c.name, reasonInput, noteEl);
+    reasonWrap.appendChild(reasonInput);
+    reasonWrap.appendChild(reasonSave);
+
     ['present','late','absent','half'].forEach(function(s){
       var btn = document.createElement('button');
       btn.className = 'att-chip'+(cur.status===s?' '+ATT_CLASSES[s]:'');
       btn.textContent = ATT_LABELS[s];
       if(isToday){
-        btn.onclick=(function(name,status,b){ return function(){
-          row.querySelectorAll('.att-chip').forEach(function(t){ t.className='att-chip'; });
-          b.classList.add(ATT_CLASSES[status]);
-          _saveAttRow(name, status, date);
-        }; })(c.name, s, btn);
+        btn.onclick=(function(name,status,b,rWrap,nEl,rInput){
+          return function(){
+            row.querySelectorAll('.att-chip').forEach(function(t){ t.className='att-chip'; });
+            b.classList.add(ATT_CLASSES[status]);
+            if(!attMap[name]) attMap[name]={status:'',note:''};
+            attMap[name].status = status;
+            // 사유 입력 토글
+            if(NEED_REASON.indexOf(status)>=0){
+              rWrap.classList.add('open');
+              setTimeout(function(){ rInput.focus(); }, 100);
+            } else {
+              rWrap.classList.remove('open');
+              rInput.value = '';
+              attMap[name].note = '';
+              nEl.textContent = '';
+              nEl.classList.remove('show');
+            }
+            _saveAttRow(name, status, date);
+          };
+        })(c.name, s, btn, reasonWrap, noteEl, reasonInput);
       } else {
         btn.style.cursor='default'; btn.style.opacity='.6';
       }
       statusWrap.appendChild(btn);
     });
 
-    row.appendChild(nameDiv);
-    row.appendChild(statusWrap);
+    mainDiv.appendChild(nameDiv);
+    mainDiv.appendChild(statusWrap);
+    row.appendChild(mainDiv);
+    row.appendChild(noteEl);
+    row.appendChild(reasonWrap);
     attSec.appendChild(row);
   });
   body.appendChild(attSec);
@@ -2313,6 +2726,13 @@ function _saveAttRow(crewName, status, date){
     .withSuccessHandler(function(res){ if(res.success) showToast(crewName+' '+ATT_LABELS[status]+' 저장됨'); })
     .withFailureHandler(function(){ showToast('저장 실패'); })
     .saveAttendance({crewName:crewName, status:status, note:'', date:date});
+}
+
+function _saveAttNote(crewName, status, note, date){
+  google.script.run
+    .withSuccessHandler(function(res){})
+    .withFailureHandler(function(){})
+    .saveAttendance({crewName:crewName, status:status, note:note, date:date});
 }
 
 function showToast(msg){ var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove('show'); },2400); }
